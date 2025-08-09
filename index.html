@@ -82,8 +82,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center; /* center vertically */
-    gap: 20px;
+    align-items: flex-start;
+    gap: 25px; /* More space between cards */
     opacity: 0;
     transform: translateY(30px);
     pointer-events: none;
@@ -102,6 +102,9 @@
     perspective: 1000px;
     cursor: pointer;
     animation: float 4s ease-in-out infinite;
+    flex: 0 1 calc(25% - 25px); /* 4 per row */
+    height: 8vh; /* Slim rectangular shape */
+    max-width: 14%; /* Keeps them small */
   }
   .card-inner {
     position: relative;
@@ -129,7 +132,6 @@
     background: #ffe5b4;
     color: #3b2f1e;
     font-weight: bold;
-    font-size: clamp(0.7rem, 2vw, 1rem); /* adaptive font size */
   }
   .card-back {
     background: #fffaf0;
@@ -138,8 +140,13 @@
     overflow-y: auto;
   }
   @media (max-width: 600px) {
-    #cardContainer { gap: 8px; padding: 10px; }
-    .card { width: 22%; height: 22vw; animation: none; } /* smaller cards */
+    #cardContainer { gap: 15px; }
+    .card {
+      flex: 0 1 calc(25% - 15px); /* 4 per row */
+      max-width: 22%;
+      height: 8vh;
+      animation: none;
+    }
     .card-inner { height: 100%; }
     .card-back { display: none; }
   }
@@ -164,7 +171,6 @@
     padding: 20px;
     border-radius: 12px;
     position: relative;
-    white-space: pre-line; /* preserve line breaks */
   }
   #closeOverlay {
     position: absolute;
@@ -375,7 +381,7 @@ if (isMobile) {
 function openMessage(index) {
   const card = cards[index];
   document.getElementById('overlayName').textContent = card.dataset.name;
-  document.getElementById('overlayText').textContent = card.dataset.message;
+  document.getElementById('overlayText').innerHTML = card.dataset.message;
   document.getElementById('messageOverlay').style.display = 'flex';
 }
 
