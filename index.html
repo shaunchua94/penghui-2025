@@ -1,239 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Birthday Surprise 🎉</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Cards with Landing</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
   body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    background: none;
-    transition: background 0.5s ease;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000;
+    color: #fdf6e3;
   }
 
-  body.background-image {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-  }
-
-  /* Landing page uses background.jpg */
-  body.background-image.landing::before {
+  body.background-image::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    background: url('images/background.jpg') center center / cover no-repeat;
+    background:
+      linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)),
+      url('images/background.jpg') center center / cover no-repeat;
   }
 
-  /* Cards page uses white translucent overlay */
-  body.background-image:not(.landing)::before {
-    content: "";
+  #landing {
     position: fixed;
     inset: 0;
-    pointer-events: none;
-    z-index: -1;
-    background: rgba(255, 255, 255, 0.7);
-  }
-
-  h1 {
-    margin-top: 20px;
-    text-align: center;
-    color: #333;
-  }
-
-  #startScreen {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    flex: 1;
-    width: 100%;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6);
+    text-align: center;
+    padding: 20px;
   }
 
-  button {
-    background: #ff5c8a;
+  #landing h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #fdf6e3;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+  }
+
+  #landing button {
+    background: linear-gradient(135deg, #ffb347, #ffcc33);
     border: none;
-    color: white;
-    padding: 15px 30px;
-    font-size: 18px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1.2em;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    border-radius: 8px;
+    color: #3b2f1e;
+    font-weight: bold;
+    transition: background 0.3s ease;
   }
-
-  button:hover {
-    background: #e04873;
+  #landing button:hover {
+    background: linear-gradient(135deg, #ffcc33, #ffb347);
   }
 
   #gifOverlay {
-    display: none;
     position: fixed;
     inset: 0;
-    background: url('images/zenitsu.gif') center center / contain no-repeat;
-    background-color: black;
-    z-index: 1000;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
     opacity: 1;
-    transition: opacity 0.5s ease;
+    transition: opacity 1s ease;
   }
-
-  #gifOverlay.fade-out {
-    opacity: 0;
+  #gifOverlay img {
+    max-width: 80%;
+    max-height: 80%;
   }
 
   #cardContainer {
-    display: none;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
     padding: 20px;
-
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 1.2s ease, transform 1.2s ease;
+    pointer-events: none;
+    transition: opacity 0.8s ease, transform 0.8s ease;
   }
-
   #cardContainer.show {
     opacity: 1;
     transform: translateY(0);
-    display: flex;
+    pointer-events: auto;
   }
 
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
   .card {
-    width: 120px;
-    height: 160px;
+    width: min(20vw, 150px);
+    height: calc(min(20vw, 150px) * 1.33);
     perspective: 1000px;
+    cursor: pointer;
+    animation: float 4s ease-in-out infinite;
   }
-
   .card-inner {
     position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.6s;
+    transition: transform 0.8s;
     transform-style: preserve-3d;
-    cursor: pointer;
   }
-
   .card.flipped .card-inner {
     transform: rotateY(180deg);
   }
-
   .card-front, .card-back {
     position: absolute;
     width: 100%;
     height: 100%;
-    backface-visibility: hidden;
     border-radius: 10px;
+    backface-visibility: hidden;
     display: flex;
+    align-items: center;
     justify-content: center;
     padding: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-align: center;
   }
-
   .card-front {
-    background: #ffb3c6;
+    background: #ffe5b4;
+    color: #3b2f1e;
     font-weight: bold;
-    font-size: 16px;
-    text-align: center;
-    align-items: center;
   }
-
   .card-back {
-    background: #fff;
+    background: #fffaf0;
+    color: #3b2f1e;
     transform: rotateY(180deg);
-    font-size: 14px;
-    text-align: center;
     overflow-y: auto;
-    align-items: flex-start;
-    padding-top: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #ffb347 transparent;
+  }
+  .card-back::-webkit-scrollbar {
+    width: 6px;
+  }
+  .card-back::-webkit-scrollbar-thumb {
+    background: #ffb347;
+    border-radius: 3px;
   }
 </style>
 </head>
-<body>
+<body class="background-image landing">
 
-<div id="startScreen">
-  <h1>🎂 Happy Birthday! 🎂</h1>
+<div id="landing">
+  <h1>Welcome to the Card Surprise!</h1>
   <button onclick="startApp()">Start</button>
 </div>
 
-<div id="gifOverlay"></div>
+<div id="gifOverlay" style="display:none;">
+  <img src="images/zenitsu.gif" alt="Overlay GIF">
+</div>
 
-<div id="cardContainer"></div>
+<div id="cardContainer">
+  <div class="card">
+    <div class="card-inner">
+      <div class="card-front">Card 1</div>
+      <div class="card-back">Message for card 1</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-inner">
+      <div class="card-front">Card 2</div>
+      <div class="card-back">Message for card 2</div>
+    </div>
+  </div>
+</div>
 
 <script>
-  const messages = [
-    { name: "Alice", text: "Wishing you a day filled with love and cake! 🎂" },
-    { name: "Bob", text: "Happy Birthday! Hope all your dreams come true! ✨" },
-    { name: "Charlie", text: "Cheers to another year of awesomeness! 🥳" },
-    { name: "Dana", text: "Have the happiest birthday ever! 💖" },
-    { name: "Eleanor", text: "Here's a longer message just to test how scrolling works inside the card back. Make sure you can scroll this text if it gets too long for the card! Make sure you can scroll this text if it gets too long for the card!" }
-  ];
+function startApp() {
+  document.getElementById('landing').style.display = 'none';
+  const overlay = document.getElementById('gifOverlay');
+  overlay.style.display = 'flex';
 
-  window.onload = () => {
-    document.body.classList.add('background-image', 'landing');
-  };
-
-  function startApp() {
-    const startScreen = document.getElementById("startScreen");
-    const gifOverlay = document.getElementById("gifOverlay");
-    const cardContainer = document.getElementById("cardContainer");
-    const body = document.body;
-
-    startScreen.style.display = "none";
-    gifOverlay.style.display = "block";
-
+  setTimeout(() => {
+    overlay.style.opacity = 0;
     setTimeout(() => {
-      // Fade out GIF overlay
-      gifOverlay.classList.add('fade-out');
+      overlay.style.display = 'none';
+      const cardContainer = document.getElementById('cardContainer');
+      cardContainer.classList.add('show');
 
-      // After fade completes:
+      // Apply staggered floating effect
+      document.querySelectorAll('.card').forEach((card, i) => {
+        card.style.animationDelay = `${i * 0.4}s`;
+        card.style.animationDuration = `${3 + Math.random() * 2}s`; // 3–5s random duration
+      });
+
+      // Confetti burst
       setTimeout(() => {
-        gifOverlay.style.display = "none";
-        gifOverlay.classList.remove('fade-out');
+        confetti({
+          particleCount: 200,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }, 300);
 
-        // Show cards container with fade/slide animation
-        cardContainer.style.display = "flex";
+    }, 1000);
+  }, 4000);
+}
 
-        // Delay adding show class so transition works
-        setTimeout(() => {
-          cardContainer.classList.add('show');
-        }, 50);
-
-        // Update body background classes
-        body.classList.add('background-image');
-        body.classList.remove('landing');
-
-        // Add cards (only once)
-        if (!cardContainer.hasChildNodes()) {
-          messages.forEach(msg => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <div class="card-inner">
-                <div class="card-front">${msg.name}</div>
-                <div class="card-back">${msg.text}</div>
-              </div>
-            `;
-            card.addEventListener("click", () => {
-              card.classList.toggle("flipped");
-            });
-            cardContainer.appendChild(card);
-          });
-        }
-      }, 500); // 0.5s fade duration
-    }, 4500); // 4.5s GIF display time
-  }
+// Card flipping
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', () => {
+    card.classList.toggle('flipped');
+  });
+  card.tabIndex = 0;
+  card.addEventListener('keypress', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.classList.toggle('flipped');
+    }
+  });
+});
 </script>
-
 </body>
 </html>
