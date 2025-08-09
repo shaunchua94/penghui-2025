@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Birthday Surprise 🎉</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    background: none;
+    transition: background 0.5s ease;
+  }
+
+  body.background-image {
+    background-image: url('images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  body.background-image::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  body.background-image.landing::before {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  body.background-image:not(.landing)::before {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  h1 {
+    margin-top: 20px;
+    text-align: center;
+    color: #333;
+  }
+
+  #startScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+  }
+
+  button {
+    background: #ff5c8a;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background: #e04873;
+  }
+
+  #introVideo {
+    display: none;
+    max-width: 100%;
+    max-height: 60vh;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  #cardContainer {
+    display: none;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 120px;
+    height: 160px;
+    perspective: 1000px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .card-front {
+    background: #ffb3c6;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .card-back {
+    background: #fff;
+    transform: rotateY(180deg);
+    font-size: 14px;
+    text-align: center;
+    overflow-y: auto;
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>🎂 Happy Birthday! 🎂</h1>
+  <button onclick="startApp()">Start</button>
+</div>
+
+<video id="introVideo" muted playsinline>
+  <source src="videos/zenitsu.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+<div id="cardContainer"></div>
+
+<script>
+  const messages = [
+    { name: "Alice", text: "Wishing you a day filled with love and cake! 🎂" },
+    { name: "Bob", text: "Happy Birthday! Hope all your dreams come true! ✨" },
+    { name: "Charlie", text: "Cheers to another year of awesomeness! 🥳" },
+    { name: "Dana", text: "Have the happiest birthday ever! 💖" },
+    { name: "Eleanor", text: "Here's a longer message just to test how scrolling works inside the card back. Make sure you can scroll this text if it gets too long for the card! Make sure you can scroll this text if it gets too long for the card!" }
+  ];
+
+  window.onload = () => {
+    document.body.classList.add('background-image', 'landing');
+  };
+
+  function startApp() {
+    const body = document.body;
+    const startScreen = document.getElementById("startScreen");
+    const introVideo = document.getElementById("introVideo");
+    const cardContainer = document.getElementById("cardContainer");
+
+    startScreen.style.display = "none";
+    introVideo.style.display = "block";
+    introVideo.play();
+
+    introVideo.onended = () => {
+      introVideo.style.display = "none";
+      cardContainer.style.display = "flex";
+
+      body.classList.add('background-image');
+      body.classList.remove('landing');
+
+      messages.forEach(msg => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">${msg.name}</div>
+            <div class="card-back">${msg.text}</div>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          card.classList.toggle("flipped");
+        });
+        cardContainer.appendChild(card);
+      });
+    };
+  }
+</script>
+
+</body>
+</html>
