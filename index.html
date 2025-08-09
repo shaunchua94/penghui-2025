@@ -142,13 +142,13 @@
     overflow-y: auto;
   }
   @media (max-width: 600px) {
-    #cardContainer { 
-      gap: 15px;
-      justify-content: center;
-      padding: 20px;
+    #cardContainer {
+      gap: 15px 5px; /* horizontal vertical */
+      justify-content: center; /* center on mobile too */
     }
     .card {
-      flex: 0 1 calc(30% - 15px); /* 3 per row with gap */
+      flex: 0 1 calc(33.333% - 15px);
+      max-width: 28%;
       height: 8vh;
       animation: none;
     }
