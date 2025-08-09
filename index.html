@@ -20,26 +20,29 @@
   }
 
   body.background-image {
-    background-image: url('images/background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
   }
 
-  body.background-image::before {
+  /* Landing page uses background.jpg */
+  body.background-image.landing::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: -1;
+    background: url('images/background.jpg') center center / cover no-repeat;
   }
 
-  body.background-image.landing::before {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
+  /* Cards page uses white translucent overlay */
   body.background-image:not(.landing)::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
     background: rgba(255, 255, 255, 0.7);
   }
 
@@ -73,13 +76,13 @@
     background: #e04873;
   }
 
-  #introVideo {
+  #gifOverlay {
     display: none;
-    max-width: 100%;
-    max-height: 60vh;
-    margin-top: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    position: fixed;
+    inset: 0;
+    background: url('images/zenitsu.gif') center center / contain no-repeat;
+    background-color: black;
+    z-index: 1000;
   }
 
   #cardContainer {
@@ -147,10 +150,7 @@
   <button onclick="startApp()">Start</button>
 </div>
 
-<video id="introVideo" autoplay muted playsinline preload="auto">
-  <source src="videos/zenitsu.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+<div id="gifOverlay"></div>
 
 <div id="cardContainer"></div>
 
@@ -169,21 +169,17 @@
 
   function startApp() {
     const startScreen = document.getElementById("startScreen");
-    const introVideo = document.getElementById("introVideo");
+    const gifOverlay = document.getElementById("gifOverlay");
     const cardContainer = document.getElementById("cardContainer");
     const body = document.body;
 
+    // Hide start screen, show GIF overlay
     startScreen.style.display = "none";
-    introVideo.style.display = "block";
+    gifOverlay.style.display = "block";
 
+    // After 5 seconds, hide GIF overlay, show cards, and update background classes
     setTimeout(() => {
-      introVideo.play().catch(err => {
-        console.log("Video play error:", err);
-      });
-    }, 100);
-
-    introVideo.onended = () => {
-      introVideo.style.display = "none";
+      gifOverlay.style.display = "none";
       cardContainer.style.display = "flex";
 
       body.classList.add('background-image');
@@ -203,7 +199,7 @@
         });
         cardContainer.appendChild(card);
       });
-    };
+    }, 4500); // 5 seconds
   }
 </script>
 
