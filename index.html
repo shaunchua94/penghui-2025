@@ -83,6 +83,12 @@
     background: url('images/zenitsu.gif') center center / contain no-repeat;
     background-color: black;
     z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  #gifOverlay.fade-out {
+    opacity: 0;
   }
 
   #cardContainer {
@@ -91,6 +97,16 @@
     gap: 15px;
     justify-content: center;
     padding: 20px;
+
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+
+  #cardContainer.show {
+    opacity: 1;
+    transform: translateY(0);
+    display: flex;
   }
 
   .card {
@@ -173,33 +189,49 @@
     const cardContainer = document.getElementById("cardContainer");
     const body = document.body;
 
-    // Hide start screen, show GIF overlay
     startScreen.style.display = "none";
     gifOverlay.style.display = "block";
 
-    // After 5 seconds, hide GIF overlay, show cards, and update background classes
     setTimeout(() => {
-      gifOverlay.style.display = "none";
-      cardContainer.style.display = "flex";
+      // Fade out GIF overlay
+      gifOverlay.classList.add('fade-out');
 
-      body.classList.add('background-image');
-      body.classList.remove('landing');
+      // After fade completes:
+      setTimeout(() => {
+        gifOverlay.style.display = "none";
+        gifOverlay.classList.remove('fade-out');
 
-      messages.forEach(msg => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="card-inner">
-            <div class="card-front">${msg.name}</div>
-            <div class="card-back">${msg.text}</div>
-          </div>
-        `;
-        card.addEventListener("click", () => {
-          card.classList.toggle("flipped");
-        });
-        cardContainer.appendChild(card);
-      });
-    }, 4500); // 5 seconds
+        // Show cards container with fade/slide animation
+        cardContainer.style.display = "flex";
+
+        // Delay adding show class so transition works
+        setTimeout(() => {
+          cardContainer.classList.add('show');
+        }, 50);
+
+        // Update body background classes
+        body.classList.add('background-image');
+        body.classList.remove('landing');
+
+        // Add cards (only once)
+        if (!cardContainer.hasChildNodes()) {
+          messages.forEach(msg => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <div class="card-inner">
+                <div class="card-front">${msg.name}</div>
+                <div class="card-back">${msg.text}</div>
+              </div>
+            `;
+            card.addEventListener("click", () => {
+              card.classList.toggle("flipped");
+            });
+            cardContainer.appendChild(card);
+          });
+        }
+      }, 500); // 0.5s fade duration
+    }, 4500); // 4.5s GIF display time
   }
 </script>
 
