@@ -82,7 +82,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center; /* center vertically */
     gap: 20px;
     opacity: 0;
     transform: translateY(30px);
@@ -129,6 +129,7 @@
     background: #ffe5b4;
     color: #3b2f1e;
     font-weight: bold;
+    font-size: clamp(0.7rem, 2vw, 1rem); /* adaptive font size */
   }
   .card-back {
     background: #fffaf0;
@@ -137,8 +138,8 @@
     overflow-y: auto;
   }
   @media (max-width: 600px) {
-    #cardContainer { gap: 10px; }
-    .card { width: 30%; height: 30vw; animation: none; }
+    #cardContainer { gap: 8px; padding: 10px; }
+    .card { width: 22%; height: 22vw; animation: none; } /* smaller cards */
     .card-inner { height: 100%; }
     .card-back { display: none; }
   }
@@ -163,6 +164,7 @@
     padding: 20px;
     border-radius: 12px;
     position: relative;
+    white-space: pre-line; /* preserve line breaks */
   }
   #closeOverlay {
     position: absolute;
@@ -200,6 +202,7 @@
   <img src="images/zenitsu.gif" alt="Overlay GIF">
 </div>
 
+<!-- Card container -->
 <div id="cardContainer">
   <!-- Cards -->
   <div class="card" data-name="Baoru" data-message="Hi Peng Hui, blessed birthday! I thank God for your life and for the quiet strength you carry. Even though you’re soft-spoken, I can see that your heart is tender toward Him, and it’s always such a blessing to hear the glimpses you share about how God is working in your life and family. I pray this year draws you even closer to Him—that you continue to know His heart more deeply and walk in His peace and joy. May He bless you abundantly in every way!! 🥳
@@ -372,7 +375,7 @@ if (isMobile) {
 function openMessage(index) {
   const card = cards[index];
   document.getElementById('overlayName').textContent = card.dataset.name;
-  document.getElementById('overlayText').innerHTML = card.dataset.message;
+  document.getElementById('overlayText').textContent = card.dataset.message;
   document.getElementById('messageOverlay').style.display = 'flex';
 }
 
