@@ -87,7 +87,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 20px;
     opacity: 0;
     transform: translateY(30px);
@@ -100,7 +100,6 @@
     pointer-events: auto;
   }
 
-  /* Floating animation */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-5px); }
@@ -128,28 +127,24 @@
     height: 100%;
     border-radius: 10px;
     backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px;
     text-align: center;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ffb347 transparent;
   }
   .card-front {
     background: #ffe5b4;
     color: #3b2f1e;
     font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .card-back {
     background: #fffaf0;
     color: #3b2f1e;
     transform: rotateY(180deg);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #ffb347 transparent;
-
-    /* Fixed to make text start at top */
-    display: block;
-    text-align: left;
   }
   .card-back::-webkit-scrollbar {
     width: 6px;
@@ -157,6 +152,34 @@
   .card-back::-webkit-scrollbar-thumb {
     background: #ffb347;
     border-radius: 3px;
+  }
+
+  /* Fullscreen overlay for mobile */
+  #fullscreenOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  #fullscreenOverlay.show {
+    display: flex;
+  }
+  .fullscreen-card {
+    width: 90%;
+    height: auto;
+    max-height: 90%;
+  }
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2em;
+    color: #fff;
+    cursor: pointer;
   }
 </style>
 </head>
@@ -362,7 +385,42 @@
   </div>
 </div>
 
+<div id="fullscreenOverlay"></div>
+
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById('cardContainer');
+  const cards = Array.from(container.querySelectorAll('.card'));
+
+  // Sort alphabetically by front text
+  cards.sort((a, b) => {
+    const frontA = a.querySelector('.card-front').textContent.trim().toLowerCase();
+    const frontB = b.querySelector('.card-front').textContent.trim().toLowerCase();
+    return frontA.localeCompare(frontB);
+  });
+
+  // Clear and re-append sorted
+  container.innerHTML = '';
+  cards.forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.2}s`; // stagger float
+    card.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        openFullscreen(card);
+      } else {
+        card.classList.toggle('flipped');
+      }
+    });
+    card.tabIndex = 0;
+    card.addEventListener('keypress', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.classList.toggle('flipped');
+      }
+    });
+    container.appendChild(card);
+  });
+});
+
 function startApp() {
   document.getElementById('landing').style.display = 'none';
   const overlay = document.getElementById('gifOverlay');
@@ -375,38 +433,26 @@ function startApp() {
       const cardContainer = document.getElementById('cardContainer');
       cardContainer.classList.add('show');
 
-      // Staggered floating effect
-      document.querySelectorAll('.card').forEach((card, i) => {
-        card.style.animationDelay = `${i * 0.4}s`;
-        card.style.animationDuration = `${3 + Math.random() * 2}s`;
-      });
-
-      // Confetti burst
       setTimeout(() => {
-        confetti({
-          particleCount: 200,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
       }, 300);
-
     }, 1000);
-  }, 4000); // Matches your 4s GIF length
+  }, 4000);
 }
 
-// Card flipping
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('click', () => {
-    card.classList.toggle('flipped');
-  });
-  card.tabIndex = 0;
-  card.addEventListener('keypress', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      card.classList.toggle('flipped');
-    }
-  });
-});
+function openFullscreen(card) {
+  const overlay = document.getElementById('fullscreenOverlay');
+  overlay.innerHTML = `<span class="close-btn" onclick="closeFullscreen()">✖</span>`;
+  const clone = card.cloneNode(true);
+  clone.classList.add('fullscreen-card');
+  clone.classList.add('flipped');
+  overlay.appendChild(clone);
+  overlay.classList.add('show');
+}
+
+function closeFullscreen() {
+  document.getElementById('fullscreenOverlay').classList.remove('show');
+}
 </script>
 </body>
 </html>
