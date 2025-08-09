@@ -143,11 +143,11 @@
 <body>
 
 <div id="startScreen">
-  <h1>🎂 Happy Birthdayy! 🎂</h1>
+  <h1>🎂 Happy Birthday! 🎂</h1>
   <button onclick="startApp()">Start</button>
 </div>
 
-<video id="introVideo" autoplay muted playsinline>
+<video id="introVideo" autoplay muted playsinline preload="auto">
   <source src="videos/zenitsu.mp4" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
@@ -168,14 +168,19 @@
   };
 
   function startApp() {
-    const body = document.body;
     const startScreen = document.getElementById("startScreen");
     const introVideo = document.getElementById("introVideo");
     const cardContainer = document.getElementById("cardContainer");
+    const body = document.body;
 
     startScreen.style.display = "none";
     introVideo.style.display = "block";
-    introVideo.play();
+
+    setTimeout(() => {
+      introVideo.play().catch(err => {
+        console.log("Video play error:", err);
+      });
+    }, 100);
 
     introVideo.onended = () => {
       introVideo.style.display = "none";
