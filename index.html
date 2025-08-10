@@ -340,6 +340,11 @@ Bren">
 function startApp() {
   document.getElementById('landing').style.display = 'none';
   const overlay = document.getElementById('gifOverlay');
+
+  // to force gif to always play from frame 1
+  const gif = overlay.querySelector('img');
+  gif.src = `images/zenitsu.gif?t=${Date.now()}`;
+
   overlay.style.display = 'flex';
   setTimeout(() => {
     overlay.style.opacity = 0;
@@ -349,9 +354,9 @@ function startApp() {
       cardContainer.classList.add('show');
       setTimeout(() => {
         confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
-      }, 300);
-    }, 1000);
-  }, 4000);
+      }, 100);
+    }, 200);
+  }, 4200);
 }
 
 const isMobile = window.matchMedia("(max-width: 600px)").matches;
